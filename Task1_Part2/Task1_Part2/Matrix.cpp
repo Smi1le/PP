@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Matrix.h"
 
+
 const int n = 5;
 
 using namespace std;
@@ -109,7 +110,7 @@ DWORD WINAPI CMatrixHelperParallel::CalculateTransposedMatrix(PVOID pvParam)
 	return result;
 }*/
 
-DWORD WINAPI CMatrixHelperParallel::CalculateMatrixMinors(PVOID pvParam)
+DWORD CMatrixHelperParallel::CalculateMatrixMinors(PVOID pvParam)
 {
 	SMiniMatrix data = (*((SMiniMatrix *)pvParam));
 	Matrix copyMatrix = matrix->basicMatrix;
@@ -154,29 +155,61 @@ void CMatrixHelperParallel::CalculateMatrixCofactors()
 	std::vector<HANDLE> hThread;
 	int width = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix[0].size() / m_numberThreads) + 1 :
 		int(matrix->basicMatrix[0].size() / m_numberThreads);
+	int length = matrix->basicMatrix[0].size();
 	int y = width;
+	if (matrix->basicMatrix.size() < m_numberThreads)
+	{
+		width = 1;
+		length = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix.size() /
+			(int(m_numberThreads / matrix->basicMatrix[0].size()) + 1)) :
+			int(matrix->basicMatrix.size() / int(m_numberThreads / matrix->basicMatrix[0].size()));
+	}
+	int to_x = length;
+	int from_x = 0;
+	int to_y;
 	for (size_t id = 1; id != m_numberThreads; ++id)
 	{
 		std::cout << "|********************************************************|" << std::endl;
 		std::cout << "width * i = " << width * id << std::endl;
 		std::cout << "width * (j + 1) = " << width * (id + 1) << std::endl;
 		std::cout << "|********************************************************|" << std::endl;
+		if (id + 1 != m_numberThreads)
+		{
+			to_y = width + y >= matrix->basicMatrix.size() ? matrix->basicMatrix.size() : width + y;
+		}
 
-		int to_y = width + y >= matrix->basicMatrix.size() ? matrix->basicMatrix.size() : width + y;
 		auto th = CreateThread(NULL, 0, CalculateMatrixCofactors,
-			(PVOID)&SMiniMatrix(0, y, matrix->basicMatrix.size(), to_y), 0, &dwThreadId[id - 1]);
+			(PVOID)&SMiniMatrix(from_x, y, to_x, to_y), 0, &dwThreadId[id - 1]);
 		hThread.push_back(th);
 		if (m_numberThreads - id - 1 == matrix->basicMatrix.size() - to_y + 1)
 		{
 			width = 1;
 		}
 		y += width;
+		if (y == matrix->basicMatrix.size() && id + 1 != m_numberThreads)
+		{
+			y = 1;
+			to_x += length;
+			from_x += length;
+			if (m_numberThreads - id - 1 <= matrix->basicMatrix.size())
+			{
+				to_x = matrix->basicMatrix.size();
+			}
+			if (to_x > matrix->basicMatrix.size())
+			{
+				to_x = matrix->basicMatrix.size();
+			}
+
+		}
+		if (id + 1 == m_numberThreads - 1)
+		{
+			to_y = matrix->basicMatrix.size();
+		}
 		if (!hThread.data()[id]) std::cout << "Error!" << std::endl;
 	}
 	width = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix[0].size() / m_numberThreads) + 1 :
 		int(matrix->basicMatrix[0].size() / m_numberThreads);
 	CalculateMatrixCofactors((PVOID)&SMiniMatrix(0, 0, matrix->basicMatrix.size(), width));
-
 	dw = WaitForMultipleObjects(m_numberThreads - 1, hThread.data(), TRUE, INFINITE);
 
 }
@@ -189,23 +222,56 @@ void CMatrixHelperParallel::CalculateMatrixMinors()
 	std::vector<HANDLE> hThread;
 	int width = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix[0].size() / m_numberThreads) + 1 :
 		int(matrix->basicMatrix[0].size() / m_numberThreads);
+	int length = matrix->basicMatrix[0].size();
 	int y = width;
+	if (matrix->basicMatrix.size() < m_numberThreads)
+	{
+		width = 1;
+		length = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int (matrix->basicMatrix.size() / 
+			(int(m_numberThreads / matrix->basicMatrix[0].size()) + 1)) :
+			int (matrix->basicMatrix.size() / int(m_numberThreads / matrix->basicMatrix[0].size()));
+	}
+	int to_x = length;
+	int from_x = 0;
+	int to_y;
 	for (size_t id = 1; id != m_numberThreads; ++id)
 	{
 		std::cout << "|********************************************************|" << std::endl;
 		std::cout << "width * i = " << width * id << std::endl;
 		std::cout << "width * (j + 1) = " << width * (id + 1) << std::endl;
 		std::cout << "|********************************************************|" << std::endl;
-
-		int to_y = width + y >= matrix->basicMatrix.size() ? matrix->basicMatrix.size() : width + y;
+		if (id + 1 != m_numberThreads)
+		{
+			to_y = width + y >= matrix->basicMatrix.size() ? matrix->basicMatrix.size() : width + y;
+		}
+		
 		auto th = CreateThread(NULL, 0, CalculateMatrixMinors,
-			(PVOID)&SMiniMatrix(0, y, matrix->basicMatrix.size(), to_y), 0, &dwThreadId[id - 1]);
+			(PVOID)&SMiniMatrix(from_x, y, to_x, to_y), 0, &dwThreadId[id - 1]);
 		hThread.push_back(th);
 		if (m_numberThreads - id - 1 == matrix->basicMatrix.size() - to_y + 1)
 		{
 			width = 1;
 		}
 		y += width;
+		if (y == matrix->basicMatrix.size() && id + 1 != m_numberThreads)
+		{
+			y = 1;
+			to_x += length;
+			from_x += length;
+			if (m_numberThreads - id - 1 <= matrix->basicMatrix.size())
+			{
+				to_x = matrix->basicMatrix.size();
+			}
+			if (to_x > matrix->basicMatrix.size())
+			{
+				to_x = matrix->basicMatrix.size();
+			}
+			
+		}
+		if (id + 1 == m_numberThreads - 1)
+		{
+			to_y = matrix->basicMatrix.size();
+		}
 		if (!hThread.data()[id]) std::cout << "Error!" << std::endl;
 	}
 	width = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix[0].size() / m_numberThreads) + 1 :
@@ -222,30 +288,61 @@ void CMatrixHelperParallel::CalculateTransposedMatrix()
 	std::vector<HANDLE> hThread;
 	int width = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix[0].size() / m_numberThreads) + 1 :
 		int(matrix->basicMatrix[0].size() / m_numberThreads);
+	int length = matrix->basicMatrix[0].size();
 	int y = width;
+	if (matrix->basicMatrix.size() < m_numberThreads)
+	{
+		width = 1;
+		length = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix.size() /
+			(int(m_numberThreads / matrix->basicMatrix[0].size()) + 1)) :
+			int(matrix->basicMatrix.size() / int(m_numberThreads / matrix->basicMatrix[0].size()));
+	}
+	int to_x = length;
+	int from_x = 0;
+	int to_y;
 	for (size_t id = 1; id != m_numberThreads; ++id)
 	{
 		std::cout << "|********************************************************|" << std::endl;
 		std::cout << "width * i = " << width * id << std::endl;
 		std::cout << "width * (j + 1) = " << width * (id + 1) << std::endl;
 		std::cout << "|********************************************************|" << std::endl;
+		if (id + 1 != m_numberThreads)
+		{
+			to_y = width + y >= matrix->basicMatrix.size() ? matrix->basicMatrix.size() : width + y;
+		}
 
-		int to_y = width + y >= matrix->basicMatrix.size() ? matrix->basicMatrix.size() : width + y;
 		auto th = CreateThread(NULL, 0, CalculateTransposedMatrix,
-			(PVOID)&SMiniMatrix(0, y, matrix->basicMatrix.size(), to_y), 0, &dwThreadId[id - 1]);
+			(PVOID)&SMiniMatrix(from_x, y, to_x, to_y), 0, &dwThreadId[id - 1]);
 		hThread.push_back(th);
 		if (m_numberThreads - id - 1 == matrix->basicMatrix.size() - to_y + 1)
 		{
 			width = 1;
 		}
 		y += width;
+		if (y == matrix->basicMatrix.size() && id + 1 != m_numberThreads)
+		{
+			y = 1;
+			to_x += length;
+			from_x += length;
+			if (m_numberThreads - id - 1 <= matrix->basicMatrix.size())
+			{
+				to_x = matrix->basicMatrix.size();
+			}
+			if (to_x > matrix->basicMatrix.size())
+			{
+				to_x = matrix->basicMatrix.size();
+			}
+
+		}
+		if (id + 1 == m_numberThreads - 1)
+		{
+			to_y = matrix->basicMatrix.size();
+		}
 		if (!hThread.data()[id]) std::cout << "Error!" << std::endl;
 	}
 	width = matrix->basicMatrix[0].size() % m_numberThreads > 0 ? int(matrix->basicMatrix[0].size() / m_numberThreads) + 1 :
 		int(matrix->basicMatrix[0].size() / m_numberThreads);
 	CalculateTransposedMatrix((PVOID)&SMiniMatrix(0, 0, matrix->basicMatrix.size(), width));
-
-
 	dw = WaitForMultipleObjects(m_numberThreads - 1, hThread.data(), TRUE, INFINITE);
 
 

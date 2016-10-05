@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 using Matrix = std::vector<std::vector<int>>;
 
@@ -58,6 +59,7 @@ public:
 	virtual Matrix GetTransposedMatrix() = 0;
 };
 
+//typedef DWORD CALLBACK (*function)(PVOID);
 
 class CMatrixHelperParallel: IMatrixHelper
 {

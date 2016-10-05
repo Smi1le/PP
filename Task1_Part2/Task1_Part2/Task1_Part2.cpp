@@ -9,12 +9,12 @@
 int main(int argc, char *argv[])
 {
 	
-	if (argc != 2)
+	/*if (argc != 2)
 	{
 		std::cerr << "Error! Usage program.exe <number Threads>" << std::endl;
 		return EXIT_FAILURE;
-	}
-	CMatrixHelperParallel matrixHelper(atoi(argv[1]));
+	}*/
+	CMatrixHelperParallel matrixHelper(33);
 	matrixHelper.GetTransposedMatrix();
 	std::cout << "|************************************************|" << std::endl;
 	CMatrixHelperSuccessively matrixHelper2;
