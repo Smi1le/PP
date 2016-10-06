@@ -2,8 +2,10 @@
 //
 
 #include "stdafx.h"
-#include "Matrix.h"
-
+#include "MatrixHelperSuccessively.h"
+#include "MatrixHelperParallel.h"
+#include <iterator>
+#include <chrono>
 
 
 int main(int argc, char *argv[])
@@ -14,11 +16,22 @@ int main(int argc, char *argv[])
 		std::cerr << "Error! Usage program.exe <number Threads>" << std::endl;
 		return EXIT_FAILURE;
 	}*/
-	CMatrixHelperParallel matrixHelper(33);
+	CMatrixHelperParallel matrixHelper(5);
+	auto startParallel = std::chrono::system_clock::now();
 	matrixHelper.GetTransposedMatrix();
-	std::cout << "|************************************************|" << std::endl;
+	auto endParallel = std::chrono::system_clock::now();
+
+	auto startSuccessievely = std::chrono::system_clock::now();
 	CMatrixHelperSuccessively matrixHelper2;
-	Output(matrixHelper2.GetTransposedMatrix());
+	matrixHelper2.GetTransposedMatrix();
+	auto endSuccessievely = std::chrono::system_clock::now();
+	
+	std::chrono::duration<double> diff = endParallel - startParallel;
+	std::cout << "\nTime parallel: " << diff.count() << std::endl;
+
+	std::chrono::duration<double> diff2 = endSuccessievely - startSuccessievely;
+	std::cout << "\nTime successievely: " << diff2.count() << std::endl;
+	_getch();
     return 0;
 }
 
