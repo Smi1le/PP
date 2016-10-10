@@ -1,6 +1,6 @@
 #pragma once
 
-using Matrix = std::vector<std::vector<int>>;
+using Matrix = std::vector<std::vector<float>>;
 
 void Output(Matrix const &matrix);
 void Erase(Matrix &matrix, size_t i, size_t j);

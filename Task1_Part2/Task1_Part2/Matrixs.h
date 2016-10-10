@@ -1,6 +1,6 @@
 #pragma once
 
-using Matrix = std::vector<std::vector<int>>;
+using Matrix = std::vector<std::vector<float>>;
 
 struct SMatrixs
 {

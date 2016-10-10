@@ -75,13 +75,28 @@ CMatrixHelperParallel::CMatrixHelperParallel(int numberThreads)
 Matrix CMatrixHelperParallel::GetTransposedMatrix()
 {
 	Output(matrix->basicMatrix);
+	int number = (GetDeterminantMatrix(matrix->basicMatrix));
 	CalculateMatrixMinors();
-
-	//Output(matrix->minorsMatrix);
+	Output(matrix->minorsMatrix);
 	CalculateMatrixCofactors();
-	//Output(matrix->minorsMatrix);
+	Output(matrix->minorsMatrix);
 	CalculateTransposedMatrix();
-	//Output(matrix->basicMatrix);
+	Output(matrix->basicMatrix);
+
+	for (auto &row : matrix->basicMatrix)
+	{
+		for (auto &cell : row)
+		{
+			if (number < 0)
+			{
+				cell = -cell / -number;
+			}
+			else
+			{
+				cell = cell / number;
+			}
+		}
+	}
 
 	return matrix->basicMatrix;
 }

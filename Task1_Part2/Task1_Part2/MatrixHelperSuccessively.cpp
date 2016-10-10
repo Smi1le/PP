@@ -29,7 +29,7 @@ Matrix CMatrixHelperSuccessively::GetMatrixCofactors(Matrix matrix)
 
 Matrix CMatrixHelperSuccessively::GetTransposedMatrix(Matrix const &matrix)
 {
-	vector<vector<int>> newMatrix;
+	vector<vector<float>> newMatrix;
 	Resize(newMatrix, (int)matrix.size());
 	for (size_t i = 0; i != matrix.size(); ++i)
 	{

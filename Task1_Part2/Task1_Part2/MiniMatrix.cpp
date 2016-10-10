@@ -27,7 +27,7 @@ void Resize(Matrix &matrix, int number)
 
 int GetDeterminantMatrix(Matrix matrix, int result, int count)
 {
-	vector<vector<int>> oldMatrix(matrix);
+	vector<vector<float>> oldMatrix(matrix);
 	size_t size = matrix.size();
 	for (size_t i = 0; i != size; ++i)
 	{

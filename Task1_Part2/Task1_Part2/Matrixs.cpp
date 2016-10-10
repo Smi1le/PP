@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Matrixs.h"
-
+#include "MiniMatrix.h"
 
 SMatrixs::SMatrixs()
 {
-	int size = 10;
+	int size = 6;
 	basicMatrix.resize(size);
 	for (size_t i = 0; i != size; ++i)
 	{
@@ -20,4 +20,9 @@ SMatrixs::SMatrixs()
 		minorsMatrix[i].resize(size);
 	}
 	copyBasicMatrix = basicMatrix;
+	std::cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||||||" << std::endl;
+	Output(basicMatrix);
+	std::cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||||||" << std::endl;
+	Output(copyBasicMatrix);
+	std::cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||||||" << std::endl;
 }
