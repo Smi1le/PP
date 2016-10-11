@@ -8,9 +8,17 @@ Matrix CMatrixHelperSuccessively::GetTransposedMatrix()
 {
 	Matrix basicMatrix = matrix->copyBasicMatrix;
 	Matrix minorsMatrix;
+	int number = GetDeterminantMatrix(basicMatrix);
 	minorsMatrix = GetMatrixMinors(basicMatrix);
 	minorsMatrix = GetMatrixCofactors(minorsMatrix);
 	basicMatrix = GetTransposedMatrix(minorsMatrix);
+	for (auto &row : basicMatrix)
+	{
+		for (auto &cell : row)
+		{
+			cell = number < 0 ? -cell / -number : cell / number;
+		}
+	}
 	return basicMatrix;
 }
 

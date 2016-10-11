@@ -28,27 +28,6 @@ DWORD WINAPI CMatrixHelperParallel::CalculateTransposedMatrix(PVOID pvParam)
 	return 0;
 }
 
-/*int CMatrixHelperParallel::CalculateDeterminantMatrix(Matrix matrix, int result, int count)
-{
-vector<vector<int>> oldMatrix(matrix);
-size_t size = oldMatrix.size();
-for (size_t i = 0; i != size; ++i)
-{
-int number = oldMatrix[0][i];
-Erase(oldMatrix, 0, i);
-if (oldMatrix.size() == 2)
-{
-result += number * (int)pow(-1, 1 + count++) * (oldMatrix[0][0] * oldMatrix[1][1] - oldMatrix[0][1] * oldMatrix[1][0]);
-}
-else
-{
-result += number * (int)pow(-1, 1 + count++) * CalculateDeterminantMatrix(oldMatrix);
-}
-oldMatrix = matrix;
-}
-return result;
-}*/
-
 DWORD CMatrixHelperParallel::CalculateMatrixMinors(PVOID pvParam)
 {
 	SMiniMatrix data = (*((SMiniMatrix *)pvParam));
@@ -74,14 +53,10 @@ CMatrixHelperParallel::CMatrixHelperParallel(int numberThreads)
 
 Matrix CMatrixHelperParallel::GetTransposedMatrix()
 {
-	Output(matrix->basicMatrix);
 	int number = (GetDeterminantMatrix(matrix->basicMatrix));
 	CalculateMatrixMinors();
-	Output(matrix->minorsMatrix);
 	CalculateMatrixCofactors();
-	Output(matrix->minorsMatrix);
 	CalculateTransposedMatrix();
-	Output(matrix->basicMatrix);
 
 	for (auto &row : matrix->basicMatrix)
 	{
@@ -97,7 +72,6 @@ Matrix CMatrixHelperParallel::GetTransposedMatrix()
 			}
 		}
 	}
-
 	return matrix->basicMatrix;
 }
 
@@ -123,10 +97,10 @@ void CMatrixHelperParallel::CalculateMatrixCofactors()
 	int to_y;
 	for (size_t id = 1; id != m_numberThreads; ++id)
 	{
-		/*std::cout << "|********************************************************|" << std::endl;
+		std::cout << "|********************************************************|" << std::endl;
 		std::cout << "width * i = " << lengthByX * id << std::endl;
 		std::cout << "width * (j + 1) = " << lengthByX * (id + 1) << std::endl;
-		std::cout << "|********************************************************|" << std::endl;*/
+		std::cout << "|********************************************************|" << std::endl;
 		if (id + 1 != m_numberThreads)
 		{
 			to_y = lengthByX + from_y >= matrix->basicMatrix.size() ? (int)matrix->basicMatrix.size() : int(lengthByX + from_y);
@@ -189,10 +163,10 @@ void CMatrixHelperParallel::CalculateMatrixMinors()
 	int to_y;
 	for (size_t id = 1; id != m_numberThreads; ++id)
 	{
-		/*std::cout << "|********************************************************|" << std::endl;
+		std::cout << "|********************************************************|" << std::endl;
 		std::cout << "width * i = " << lengthByX * id << std::endl;
 		std::cout << "width * (j + 1) = " << lengthByX * (id + 1) << std::endl;
-		std::cout << "|********************************************************|" << std::endl;*/
+		std::cout << "|********************************************************|" << std::endl;
 		if (id + 1 != m_numberThreads)
 		{
 			to_y = lengthByX + from_y >= matrix->basicMatrix.size() ? (int)matrix->basicMatrix.size() : int(lengthByX + from_y);
@@ -254,10 +228,10 @@ void CMatrixHelperParallel::CalculateTransposedMatrix()
 	int to_y;
 	for (size_t id = 1; id != m_numberThreads; ++id)
 	{
-		/*std::cout << "|********************************************************|" << std::endl;
+		std::cout << "|********************************************************|" << std::endl;
 		std::cout << "width * i = " << lengthByX * id << std::endl;
 		std::cout << "width * (j + 1) = " << lengthByX * (id + 1) << std::endl;
-		std::cout << "|********************************************************|" << std::endl;*/
+		std::cout << "|********************************************************|" << std::endl;
 		if (id + 1 != m_numberThreads)
 		{
 			to_y = lengthByX + from_y >= matrix->basicMatrix.size() ? (int)matrix->basicMatrix.size() : int(lengthByX + from_y);

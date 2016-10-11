@@ -4,7 +4,7 @@
 
 SMatrixs::SMatrixs()
 {
-	int size = 6;
+	int size = 11;
 	basicMatrix.resize(size);
 	for (size_t i = 0; i != size; ++i)
 	{
@@ -20,9 +20,4 @@ SMatrixs::SMatrixs()
 		minorsMatrix[i].resize(size);
 	}
 	copyBasicMatrix = basicMatrix;
-	std::cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||||||" << std::endl;
-	Output(basicMatrix);
-	std::cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||||||" << std::endl;
-	Output(copyBasicMatrix);
-	std::cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||||||" << std::endl;
 }
