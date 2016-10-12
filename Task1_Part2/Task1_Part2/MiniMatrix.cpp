@@ -2,9 +2,6 @@
 #include "MiniMatrix.h"
 #include "Matrixs.h"
 
-
-const int n = 5;
-
 using namespace std;
 
 void Erase(Matrix &matrix, size_t i, size_t j)
@@ -25,21 +22,21 @@ void Resize(Matrix &matrix, int number)
 	}
 }
 
-int GetDeterminantMatrix(Matrix matrix, int result, int count)
+float GetDeterminantMatrix(Matrix matrix, float result, int count)
 {
-	vector<vector<float>> oldMatrix(matrix);
+	Matrix oldMatrix(matrix);
 	size_t size = matrix.size();
 	for (size_t i = 0; i != size; ++i)
 	{
-		int number = matrix[0][i];
-		Erase(matrix, 0, int(i));
+		float number = matrix[0][i];
+		Erase(matrix, 0, i);
 		if (matrix.size() == 2)
 		{
-			result += number * (int)pow(-1, 1 + count++) * (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]);
+			result += (number * powf(-1.f, float(1 + count++)) * (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]));
 		}
 		else
 		{
-			result += number * (int)pow(-1, 1 + count++) * GetDeterminantMatrix(matrix);
+			result += (number * powf(-1.f, float(1 + count++)) * GetDeterminantMatrix(matrix));
 		}
 		matrix = oldMatrix;
 	}

@@ -17,7 +17,6 @@ private:
 	static DWORD WINAPI CalculateMatrixCofactors(PVOID pvParam);
 	static DWORD WINAPI CalculateMatrixMinors(PVOID pvParam);
 	static DWORD WINAPI CalculateTransposedMatrix(PVOID pvParam);
-	//static int CalculateDeterminantMatrix(Matrix matrix, int result = 0, int count = 1);
 private:
-	int m_numberThreads;
+	size_t m_numberThreads;
 };

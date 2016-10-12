@@ -1,6 +1,3 @@
-// Task1_Part2.cpp: определяет точку входа для консольного приложения.
-//
-
 #include "stdafx.h"
 #include "MatrixHelperSuccessively.h"
 #include "MatrixHelperParallel.h"
@@ -23,8 +20,8 @@ int main(int argc, char *argv[])
 	Output(matrixHelper.GetTransposedMatrix());
 	auto endParallel = std::chrono::system_clock::now();
 
-	auto startSuccessievely = std::chrono::system_clock::now();
 	CMatrixHelperSuccessively matrixHelper2;
+	auto startSuccessievely = std::chrono::system_clock::now();
 	matrixHelper2.GetTransposedMatrix();
 	auto endSuccessievely = std::chrono::system_clock::now();
 	

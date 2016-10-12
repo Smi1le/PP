@@ -8,7 +8,7 @@ Matrix CMatrixHelperSuccessively::GetTransposedMatrix()
 {
 	Matrix basicMatrix = matrix->copyBasicMatrix;
 	Matrix minorsMatrix;
-	int number = GetDeterminantMatrix(basicMatrix);
+	float number = GetDeterminantMatrix(basicMatrix);
 	minorsMatrix = GetMatrixMinors(basicMatrix);
 	minorsMatrix = GetMatrixCofactors(minorsMatrix);
 	basicMatrix = GetTransposedMatrix(minorsMatrix);
@@ -60,9 +60,8 @@ Matrix CMatrixHelperSuccessively::GetMatrixMinors(Matrix matrix)
 	{
 		for (size_t j = 0; j != matrix[i].size(); ++j)
 		{
-			int result = 0;
 			Erase(copyMatrix, i, j);
-			int res = GetDeterminantMatrix(copyMatrix);
+			float res = GetDeterminantMatrix(copyMatrix);
 			newMatrix[i][j] = res;
 			copyMatrix = matrix;
 		}
