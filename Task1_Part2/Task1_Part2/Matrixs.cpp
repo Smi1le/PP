@@ -4,7 +4,7 @@
 
 SMatrixs::SMatrixs()
 {
-	int size = 11;
+	int size = 3;
 	basicMatrix.resize(size);
 	for (size_t i = 0; i != size; ++i)
 	{

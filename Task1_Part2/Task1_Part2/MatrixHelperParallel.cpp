@@ -57,18 +57,21 @@ Matrix CMatrixHelperParallel::GetTransposedMatrix()
 	CalculateMatrixCofactors();
 	CalculateTransposedMatrix();
 
-	for (auto &row : matrix->basicMatrix)
+
+	Output(matrix->basicMatrix);
+	for (size_t i = 0; i != matrix->basicMatrix.size(); ++i)
 	{
-		for (auto &cell : row)
+		for (size_t j = 0; j != matrix->basicMatrix[i].size(); ++j)
 		{
 			if (number < 0)
 			{
-				cell = -cell / -number;
+				matrix->basicMatrix[i][j] = -matrix->basicMatrix[i][j] / -number;
 			}
 			else
 			{
-				cell = cell / number;
+				matrix->basicMatrix[i][j] = matrix->basicMatrix[i][j] / number;
 			}
+			matrix->basicMatrix[i][j] *= (int)pow(-1, int(i) + int(j) + 2);
 		}
 	}
 	return matrix->basicMatrix;

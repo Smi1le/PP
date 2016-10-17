@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	CMatrixHelperParallel matrixHelper(atoi(argv[1]));
 
 	auto startParallel = std::chrono::system_clock::now();
-	Output(matrixHelper.GetTransposedMatrix());
+	matrixHelper.GetTransposedMatrix();
 	auto endParallel = std::chrono::system_clock::now();
 
 	CMatrixHelperSuccessively matrixHelper2;
