@@ -42,7 +42,7 @@ size_t CBank::GetNumberClients() const
 	return m_clients.size();
 }
 
-/*HANDLE * CBank::GetHandles() const
+HANDLE * CBank::GetHandles() const
 {
 	std::vector<HANDLE> handles;
 
@@ -53,7 +53,7 @@ size_t CBank::GetNumberClients() const
 
 	return handles.data();
 }
-*/
+
 
 int CBank::GetTotalBalance()
 {
