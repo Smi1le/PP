@@ -8,6 +8,7 @@ class CBank
 {
 public:
 	CBank();
+	~CBank();
 	CBankClient* CreateClient();
 	void UpdateClientBalance(CBankClient& client, int value);
 	size_t GetNumberClients() const;
@@ -15,6 +16,7 @@ public:
 private:
 	std::vector<CBankClient> m_clients;
 	int m_totalBalance;
+	HANDLE m_hMutex;
 
 	int GetTotalBalance();
 	void SetTotalBalance(int value);

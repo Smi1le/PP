@@ -1,19 +1,26 @@
 #include "CBank.h"
 
 
-CRITICAL_SECTION cs;
+
 
 CBank::CBank()
 {
+	m_hMutex = CreateMutex(NULL, false, NULL);
 	m_clients = std::vector<CBankClient>();
 	m_totalBalance = 0;
+}
+
+CBank::~CBank()
+{
+	CloseHandle(m_hMutex);
 }
 
 
 CBankClient* CBank::CreateClient()
 {
+	
 	unsigned int clientId = static_cast<unsigned>(m_clients.size());
-	CBankClient* client = new CBankClient(this, clientId);
+	CBankClient* client = new CBankClient(this, clientId, m_hMutex);
 	m_clients.push_back(*client);
 	return client;
 }
@@ -22,14 +29,14 @@ CBankClient* CBank::CreateClient()
 
 void CBank::UpdateClientBalance(CBankClient &client, int value)
 {
-	//InitializeCriticalSection(&cs);
-	//EnterCriticalSection(&cs);
+
 	int totalBalance = GetTotalBalance();
 	std::cout << "Client " << client.GetId() << " initiates reading total balance. Total = " << totalBalance << "." << std::endl;
 	
 	SomeLongOperations();
 	totalBalance += value;
-
+	
+	
 	std::cout
 		<< "Client " << client.GetId() << " updates his balance with " << value
 		<< " and initiates setting total balance to " << totalBalance
@@ -43,8 +50,6 @@ void CBank::UpdateClientBalance(CBankClient &client, int value)
 	{
 		SetTotalBalance(totalBalance);
 	}
-	//LeaveCriticalSection(&cs);
-	//DeleteCriticalSection(&cs);
 	
 }
 
@@ -81,7 +86,7 @@ void CBank::SetTotalBalance(int value)
 
 void CBank::SomeLongOperations()
 {
-	size_t number = rand() % 2001;
+	size_t number = 10001;
 	//std::cout << "rand() % 2001 " << number << std::endl;
 	for (size_t i = 0; i != number; ++i) {}
 }
