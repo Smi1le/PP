@@ -7,7 +7,7 @@ class CBankClient;
 class CBank
 {
 public:
-	CBank();
+	CBank(bool isUsingNormalForm);
 	~CBank();
 	CBankClient* CreateClient();
 	void UpdateClientBalance(CBankClient& client, int value);
@@ -17,6 +17,7 @@ private:
 	std::vector<CBankClient> m_clients;
 	int m_totalBalance;
 	HANDLE m_hMutex;
+	bool m_isUsingNormalForm;
 
 	int GetTotalBalance();
 	void SetTotalBalance(int value);

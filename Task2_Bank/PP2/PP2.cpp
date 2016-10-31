@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	
 
 
-	CBank* bank = new CBank();
+	CBank* bank = new CBank(key);
 	//CBankClient* client1 = bank->CreateClient();
 	//CBankClient* client2 = bank->CreateClient();
 

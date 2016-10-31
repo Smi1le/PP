@@ -3,8 +3,9 @@
 
 
 
-CBank::CBank()
+CBank::CBank(bool isUsingNormalForm)
 {
+	m_isUsingNormalForm = isUsingNormalForm;
 	m_hMutex = CreateMutex(NULL, false, NULL);
 	m_clients = std::vector<CBankClient>();
 	m_totalBalance = 0;
@@ -20,7 +21,7 @@ CBankClient* CBank::CreateClient()
 {
 	
 	unsigned int clientId = static_cast<unsigned>(m_clients.size());
-	CBankClient* client = new CBankClient(this, clientId, m_hMutex);
+	CBankClient* client = new CBankClient(this, clientId, m_hMutex, m_isUsingNormalForm);
 	m_clients.push_back(*client);
 	return client;
 }

@@ -1,7 +1,8 @@
 #include "CBankClient.h"
 
-CBankClient::CBankClient(CBank *bank, unsigned int id, HANDLE &mutex)
+CBankClient::CBankClient(CBank *bank, unsigned int id, HANDLE &mutex, bool nf)
 {
+	m_isUsingNormalForm = nf;
 	m_bank = bank;
 	m_id = id;
 	m_hMutex = mutex;
@@ -30,9 +31,16 @@ DWORD WINAPI CBankClient::ThreadFunction(LPVOID lpParam)
 	
 	while (true)
 	{
-		WaitForSingleObject(client->m_hMutex, INFINITE);
-		client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
-		ReleaseMutex(client->m_hMutex);
+		if (client->m_isUsingNormalForm)
+		{
+			WaitForSingleObject(client->m_hMutex, INFINITE);
+			client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+			ReleaseMutex(client->m_hMutex);
+		}
+		else
+		{
+			client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+		}
 		
 	}
 	
