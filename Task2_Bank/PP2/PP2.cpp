@@ -11,45 +11,33 @@ void DisplayUsageHelp()
 	std::cout << "WARNINGS!!!!! Use with key !!!!! Use without a key \nfor informational purposes only !!!!! \n\n" << std::endl;
 }
 
-
-int main(int argc, char *argv[])
+TypeSyncPrimitives GetTypeSyncPrimitivesInConsole()
 {
-	if (argc != 2)
-	{
-		std::cerr << "Error! Usage program.exe <client number> " << std::endl;
-		return EXIT_FAILURE;
-	}
-	TypeSyncPrimitives key;
 	std::string keyValue;
 	while (true)
 	{
 		std::cout << "Please enter whether you want to use synchronization primitives or not"
-				  << " (critical section / mutex / semaphore / event / not use ) : ";
+			<< " (critical section / mutex / semaphore / event / not use ) : ";
 		std::getline(std::cin, keyValue);
 		if (keyValue == "critical section")
 		{
-			key = TypeSyncPrimitives::CRITICAL_SECTION;
-			break;
+			return TypeSyncPrimitives::CRITICAL_SECTION;
 		}
 		else if (keyValue == "mutex")
 		{
-			key = TypeSyncPrimitives::MUTEX;
-			break;
+			return TypeSyncPrimitives::MUTEX;
 		}
 		else if (keyValue == "semaphore")
 		{
-			key = TypeSyncPrimitives::SEMAPHORE;
-			break;
+			return TypeSyncPrimitives::SEMAPHORE;
 		}
 		else if (keyValue == "event")
 		{
-			key = TypeSyncPrimitives::EVENT;
-			break;
+			return TypeSyncPrimitives::EVENT;
 		}
 		else if (keyValue == "not use")
 		{
-			key = TypeSyncPrimitives::NOT;
-			break;
+			return TypeSyncPrimitives::NOT;
 		}
 		else if (keyValue == "help")
 		{
@@ -60,6 +48,18 @@ int main(int argc, char *argv[])
 			std::cout << "You enter an incorrect key value. Try again" << std::endl;
 		}
 	}
+}
+
+
+int main(int argc, char *argv[])
+{
+	if (argc != 2)
+	{
+		std::cerr << "Error! Usage program.exe <client number> " << std::endl;
+		return EXIT_FAILURE;
+	}
+	TypeSyncPrimitives key;
+	key = GetTypeSyncPrimitivesInConsole();
 	size_t clientNumber = atoi(argv[1]);
 	
 
