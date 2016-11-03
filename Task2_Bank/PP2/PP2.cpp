@@ -14,26 +14,36 @@ void DisplayUsageHelp()
 
 int main(int argc, char *argv[])
 {
-	if (argc != 2)
+	/*if (argc != 2)
 	{
 		std::cerr << "Error! Usage program.exe <client number> " << std::endl;
 		return EXIT_FAILURE;
-	}
+	}*/
 	DisplayUsageHelp();
-	bool key = false;
+	TypeSyncPrimitives key;
 	std::string keyValue;
 	while (true)
 	{
-		std::cout << "Please enter whether you want to use synchronization primitives or not (Y/N) : ";
+		std::cout << "Please enter whether you want to use synchronization primitives or not (critical section / mutex / not) : ";
 		std::getline(std::cin, keyValue);
-		if (keyValue == "Y" || keyValue == "y")
+		if (keyValue == "critical section")
 		{
-			key = true;
+			key = TypeSyncPrimitives::CRITICAL_SECTION;
 			break;
 		}
-		else if (keyValue == "N" || keyValue == "n")
+		else if (keyValue == "mutex")
 		{
-			key = false;
+			key = TypeSyncPrimitives::MUTEX;
+			break;
+		}
+		else if (keyValue == "semaphore")
+		{
+			key = TypeSyncPrimitives::SEMAFOR;
+			break;
+		}
+		else if (keyValue == "not")
+		{
+			key = TypeSyncPrimitives::NOT;
 			break;
 		}
 		else
@@ -41,13 +51,11 @@ int main(int argc, char *argv[])
 			std::cout << "You enter an incorrect key value. Try again" << std::endl;
 		}
 	}
-	size_t clientNumber = atoi(argv[1]);
+	size_t clientNumber = 2;//atoi(argv[1]);
 	
 
 
 	CBank* bank = new CBank(key);
-	//CBankClient* client1 = bank->CreateClient();
-	//CBankClient* client2 = bank->CreateClient();
 
 	std::vector<CBankClient*> clients;
 
@@ -59,7 +67,7 @@ int main(int argc, char *argv[])
 
 	while (true)
 	{
-		WaitForMultipleObjects(static_cast<DWORD>(bank->GetNumberClients()), bank->GetHandles(), TRUE, INFINITE);
+		WaitForMultipleObjects(static_cast<DWORD>(bank->GetClientsCount()), bank->GetClientsHandles(), TRUE, INFINITE);
 	}
 
     return EXIT_SUCCESS;

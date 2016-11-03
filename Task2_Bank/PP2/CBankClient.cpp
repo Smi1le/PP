@@ -1,25 +1,21 @@
+#include "stdafx.h"
 #include "CBankClient.h"
 
-CBankClient::CBankClient(CBank *bank, unsigned int id, HANDLE &mutex, bool nf)
-{
-	m_isUsingNormalForm = nf;
-	m_bank = bank;
-	m_id = id;
-	m_hMutex = mutex;
-	m_handle = CreateThread(NULL, 0, ThreadFunction, this, 0, NULL);
-}
-
+CBankClient::CBankClient(CBank *bank, unsigned int id, SyncPrimitives *primitives)
+	: m_syncPrimitives(primitives)
+	, m_bank(bank)
+	, m_id(id)
+	, m_handle(CreateThread(NULL, 0, ThreadFunction, this, 0, NULL))
+{}
 
 unsigned int CBankClient::GetId()
 {
 	return m_id;
 }
 
-void SomeLongOperation()
+void SomeLongOperation(unsigned time)
 {
-	size_t number = rand() % 1000001;
-	int count = 0;
-	for (size_t i = 0; i != number; ++i) { count++; }
+	Sleep(time);
 }
 
 DWORD WINAPI CBankClient::ThreadFunction(LPVOID lpParam)
@@ -31,15 +27,28 @@ DWORD WINAPI CBankClient::ThreadFunction(LPVOID lpParam)
 	
 	while (true)
 	{
-		if (client->m_isUsingNormalForm)
+		SomeLongOperation(GetSleepDuration(client));
+		
+		switch (client->m_syncPrimitives->type)
 		{
-			WaitForSingleObject(client->m_hMutex, INFINITE);
-			client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
-			ReleaseMutex(client->m_hMutex);
-		}
-		else
-		{
-			client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+			case TypeSyncPrimitives::CRITICAL_SECTION:
+				EnterCriticalSection(&client->m_syncPrimitives->critical_section);
+				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+				LeaveCriticalSection(&client->m_syncPrimitives->critical_section);
+				break;
+			case TypeSyncPrimitives::SEMAPHORE:
+				WaitForSingleObject(client->m_syncPrimitives->semaphore, INFINITE);
+				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+				ReleaseSemaphore(client->m_syncPrimitives->semaphore, 1, NULL);
+				break;
+			case TypeSyncPrimitives::MUTEX:
+				WaitForSingleObject(client->m_syncPrimitives->mutex, INFINITE);
+				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+				ReleaseMutex(client->m_syncPrimitives->mutex);
+				break;
+			case TypeSyncPrimitives::NOT:
+				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+				break;
 		}
 		
 	}

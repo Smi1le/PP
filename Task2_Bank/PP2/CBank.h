@@ -1,25 +1,26 @@
 #pragma once
-#include <iostream>
-#include <vector>
 #include "CBankClient.h"
 class CBankClient;
 
 class CBank
 {
 public:
-	CBank(bool isUsingNormalForm);
+	CBank(TypeSyncPrimitives type);
 	~CBank();
 	CBankClient* CreateClient();
 	void UpdateClientBalance(CBankClient& client, int value);
-	size_t GetNumberClients() const;
-	HANDLE* GetHandles() const;
+	size_t GetClientsCount() const;
+	HANDLE* GetClientsHandles() const;
 private:
 	std::vector<CBankClient> m_clients;
 	int m_totalBalance;
-	HANDLE m_hMutex;
-	bool m_isUsingNormalForm;
+	//HANDLE m_hMutex;
+	//CRITICAL_SECTION m_cr;
+	//TypeSyncPrimitives m_typePrimitiveSync;
+	SyncPrimitives *m_syncPrimitives = nullptr;
 
 	int GetTotalBalance();
 	void SetTotalBalance(int value);
-	void SomeLongOperations();
+	void SomeLongOperations(CBankClient const &client);
+
 };

@@ -1,27 +1,28 @@
+#include "stdafx.h"
 #include "CBank.h"
 
 
 
 
-CBank::CBank(bool isUsingNormalForm)
+CBank::CBank(TypeSyncPrimitives type)
 {
-	m_isUsingNormalForm = isUsingNormalForm;
-	m_hMutex = CreateMutex(NULL, false, NULL);
+	m_syncPrimitives = new SyncPrimitives();
+	m_syncPrimitives->type = type;
 	m_clients = std::vector<CBankClient>();
 	m_totalBalance = 0;
 }
 
 CBank::~CBank()
 {
-	CloseHandle(m_hMutex);
+	CloseHandle(m_syncPrimitives->mutex);
+	DeleteCriticalSection(&m_syncPrimitives->critical_section);
 }
-
 
 CBankClient* CBank::CreateClient()
 {
 	
 	unsigned int clientId = static_cast<unsigned>(m_clients.size());
-	CBankClient* client = new CBankClient(this, clientId, m_hMutex, m_isUsingNormalForm);
+	CBankClient* client = new CBankClient(this, clientId, m_syncPrimitives);
 	m_clients.push_back(*client);
 	return client;
 }
@@ -30,38 +31,38 @@ CBankClient* CBank::CreateClient()
 
 void CBank::UpdateClientBalance(CBankClient &client, int value)
 {
-
 	int totalBalance = GetTotalBalance();
+	int lastValue = GetTotalBalance();
 	std::cout << "Client " << client.GetId() << " initiates reading total balance. Total = " << totalBalance << "." << std::endl;
 	
-	SomeLongOperations();
-	totalBalance += value;
+	SomeLongOperations(client);
 	
 	
 	std::cout
 		<< "Client " << client.GetId() << " updates his balance with " << value
 		<< " and initiates setting total balance to " << totalBalance
-		<< ". Must be: " << GetTotalBalance() + value << "." << std::endl;
+		<< ". Must be: " << (totalBalance + value) << "." << std::endl;
 
-	// Check correctness of transaction through actual total balance
-	if (totalBalance != GetTotalBalance() + value) {
-		std::cout << "! ERROR !" << std::endl;
-	}
-	else
+
+	if (totalBalance + value > 0)
 	{
-		SetTotalBalance(totalBalance);
+		SetTotalBalance(totalBalance + value);
+		std::cout << "Total Balance = " << GetTotalBalance() << std::endl;
 	}
-	
+	if (totalBalance != GetTotalBalance() - value)
+	{
+		std::cout << "Error!!!!!!!!" << std::endl;
+	}
 }
 
 
 
-size_t CBank::GetNumberClients() const
+size_t CBank::GetClientsCount() const
 {
 	return m_clients.size();
 }
 
-HANDLE * CBank::GetHandles() const
+HANDLE * CBank::GetClientsHandles() const
 {
 	std::vector<HANDLE> handles;
 
@@ -85,9 +86,7 @@ void CBank::SetTotalBalance(int value)
 	m_totalBalance = value;
 }
 
-void CBank::SomeLongOperations()
+void CBank::SomeLongOperations(CBankClient const &client)
 {
-	size_t number = 10001;
-	//std::cout << "rand() % 2001 " << number << std::endl;
-	for (size_t i = 0; i != number; ++i) {}
+	Sleep((1000 + rand() % 3000) * (client.m_id+ 1));
 }

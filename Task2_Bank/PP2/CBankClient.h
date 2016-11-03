@@ -1,5 +1,4 @@
 #pragma once
-#include <Windows.h>
 #include "CBank.h"
 class CBank;
 
@@ -7,11 +6,13 @@ class CBankClient
 {
 public:
 	unsigned int GetId();
+	~CBankClient() = default;
 private:
 	unsigned m_id;
 	CBank *m_bank;
 
-	CBankClient(CBank *bank, unsigned int id, HANDLE &mutex, bool nf);
+	CBankClient(CBank *bank, unsigned int id, SyncPrimitives *syncPrimitives);
+	
 	static unsigned int GetSleepDuration(CBankClient *client);
 	static unsigned int GetBalanceChangeValue();
 	static DWORD WINAPI ThreadFunction(LPVOID lpParam);
@@ -19,7 +20,6 @@ private:
 	friend CBank;
 
 private:
-	HANDLE m_hMutex;
 	HANDLE m_handle;
-	bool m_isUsingNormalForm;
+	SyncPrimitives *m_syncPrimitives = nullptr;
 };
