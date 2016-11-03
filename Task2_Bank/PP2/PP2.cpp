@@ -8,18 +8,17 @@ void DisplayUsageHelp()
 {
 	std::cout << "::::::::A reminder to use the program with the key::::::::\n\n\n" << std::endl;
 	std::cout << "when using the program with a data synchronization program \n will work properly without it - no" << std::endl;
-	std::cout << "WARNINGS!!!!! Use with key !!!!! Use without a key \nfor informational purposes only !!!!!" << std::endl;
+	std::cout << "WARNINGS!!!!! Use with key !!!!! Use without a key \nfor informational purposes only !!!!! \n\n" << std::endl;
 }
 
 
 int main(int argc, char *argv[])
 {
-	/*if (argc != 2)
+	if (argc != 2)
 	{
 		std::cerr << "Error! Usage program.exe <client number> " << std::endl;
 		return EXIT_FAILURE;
-	}*/
-	DisplayUsageHelp();
+	}
 	TypeSyncPrimitives key;
 	std::string keyValue;
 	while (true)
@@ -52,12 +51,16 @@ int main(int argc, char *argv[])
 			key = TypeSyncPrimitives::NOT;
 			break;
 		}
+		else if (keyValue == "help")
+		{
+			DisplayUsageHelp();
+		}
 		else
 		{
 			std::cout << "You enter an incorrect key value. Try again" << std::endl;
 		}
 	}
-	size_t clientNumber = 2;//atoi(argv[1]);
+	size_t clientNumber = atoi(argv[1]);
 	
 
 
