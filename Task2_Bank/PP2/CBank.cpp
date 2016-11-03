@@ -14,7 +14,9 @@ CBank::CBank(TypeSyncPrimitives type)
 
 CBank::~CBank()
 {
-	CloseHandle(m_syncPrimitives->mutex);
+	CloseHandle(m_syncPrimitives->hMutex);
+	CloseHandle(m_syncPrimitives->hSemaphore);
+	CloseHandle(m_syncPrimitives->hEvent);
 	DeleteCriticalSection(&m_syncPrimitives->critical_section);
 }
 
@@ -32,7 +34,6 @@ CBankClient* CBank::CreateClient()
 void CBank::UpdateClientBalance(CBankClient &client, int value)
 {
 	int totalBalance = GetTotalBalance();
-	int lastValue = GetTotalBalance();
 	std::cout << "Client " << client.GetId() << " initiates reading total balance. Total = " << totalBalance << "." << std::endl;
 	
 	SomeLongOperations(client);

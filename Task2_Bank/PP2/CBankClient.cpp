@@ -28,7 +28,6 @@ DWORD WINAPI CBankClient::ThreadFunction(LPVOID lpParam)
 	while (true)
 	{
 		SomeLongOperation(GetSleepDuration(client));
-		
 		switch (client->m_syncPrimitives->type)
 		{
 			case TypeSyncPrimitives::CRITICAL_SECTION:
@@ -37,14 +36,19 @@ DWORD WINAPI CBankClient::ThreadFunction(LPVOID lpParam)
 				LeaveCriticalSection(&client->m_syncPrimitives->critical_section);
 				break;
 			case TypeSyncPrimitives::SEMAPHORE:
-				WaitForSingleObject(client->m_syncPrimitives->semaphore, INFINITE);
+				WaitForSingleObject(client->m_syncPrimitives->hSemaphore, INFINITE);
 				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
-				ReleaseSemaphore(client->m_syncPrimitives->semaphore, 1, NULL);
+				ReleaseSemaphore(client->m_syncPrimitives->hSemaphore, 1, NULL);
 				break;
 			case TypeSyncPrimitives::MUTEX:
-				WaitForSingleObject(client->m_syncPrimitives->mutex, INFINITE);
+				WaitForSingleObject(client->m_syncPrimitives->hMutex, INFINITE);
 				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
-				ReleaseMutex(client->m_syncPrimitives->mutex);
+				ReleaseMutex(client->m_syncPrimitives->hMutex);
+				break;
+			case TypeSyncPrimitives::EVENT:
+				WaitForSingleObject(client->m_syncPrimitives->hEvent, INFINITE);
+				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());
+				SetEvent(client->m_syncPrimitives->hEvent);
 				break;
 			case TypeSyncPrimitives::NOT:
 				client->m_bank->UpdateClientBalance(*client, GetBalanceChangeValue());

@@ -24,7 +24,8 @@ int main(int argc, char *argv[])
 	std::string keyValue;
 	while (true)
 	{
-		std::cout << "Please enter whether you want to use synchronization primitives or not (critical section / mutex / not) : ";
+		std::cout << "Please enter whether you want to use synchronization primitives or not"
+				  << " (critical section / mutex / semaphore / event / not use ) : ";
 		std::getline(std::cin, keyValue);
 		if (keyValue == "critical section")
 		{
@@ -38,10 +39,15 @@ int main(int argc, char *argv[])
 		}
 		else if (keyValue == "semaphore")
 		{
-			key = TypeSyncPrimitives::SEMAFOR;
+			key = TypeSyncPrimitives::SEMAPHORE;
 			break;
 		}
-		else if (keyValue == "not")
+		else if (keyValue == "event")
+		{
+			key = TypeSyncPrimitives::EVENT;
+			break;
+		}
+		else if (keyValue == "not use")
 		{
 			key = TypeSyncPrimitives::NOT;
 			break;
