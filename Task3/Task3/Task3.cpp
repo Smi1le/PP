@@ -1,12 +1,20 @@
+/*#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+
+#endif
+*/
 #include "stdafx.h"
 #include <ctime>
 #include <cmath>
-#include <cstdlib>
-#include <iomanip>
 #include <iostream>
 #include <random>
-#include <windows.h>
+//#include <windows.h>
 #include <sstream>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <windows.h>
+
+#pragma comment(lib, "WS2_32.lib")
+#pragma comment(lib, "wsock32.lib")
 
 
 
@@ -31,6 +39,66 @@ namespace
 		os << number;
 		return os.str();
 
+	}
+
+	void TransmitDataOnServerToSockets(size_t Nmax, double Pi, std::string const &processName)
+	{
+		std::cout << "Sockets" << std::endl;
+		std::cout << "Hi pid" << std::endl;
+
+		std::string info = NumberToString(Nmax) + ", " + NumberToString(Pi) + ", " + processName;
+
+		std::cout << "info = " << info << std::endl;
+
+		WORD version = MAKEWORD(2, 2);
+		WSADATA wsaData;
+
+		WSAStartup(version, (LPWSADATA)&wsaData);
+
+		LPHOSTENT hostEnt;
+		hostEnt = gethostbyname("localhost");
+
+		
+
+		if (!hostEnt)
+		{
+			printf("Unable to collect gethostbyname\n");
+			std::cout << "error = " << WSAGetLastError() << std::endl;
+		}
+
+		SOCKET clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+		if (clientSock == SOCKET_ERROR)
+		{
+			std::cout << "Unable to create socket" << std::endl;
+		}
+
+		SOCKADDR_IN serverInfo;
+
+		serverInfo.sin_family = PF_INET;
+		serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
+		serverInfo.sin_port = htons(11111);
+
+		if (!connect(clientSock, (LPSOCKADDR)&serverInfo, sizeof(serverInfo)))
+		{
+			std::cout << "Unable to connect" << std::endl;
+			WSACleanup();
+		}
+
+		char *pBuf = "Request";
+
+		printf("Sending request from client\n");
+
+
+		std::cout << "Request" << std::endl;
+		if (send(clientSock, pBuf, strlen(pBuf), 0) == SOCKET_ERROR)
+		{
+			printf("Unable to send\n");
+			WSACleanup();
+		}
+
+
+		closesocket(clientSock);
 	}
 
 	void TransmitDataOnServer(size_t Nmax, double Pi, std::string const &processName)
@@ -89,6 +157,8 @@ namespace
 		}
 	}
 
+
+
 	double GetNumberPi(size_t iterationsNumber)
 	{
 		size_t Nmax = iterationsNumber;
@@ -120,6 +190,8 @@ int main(int argc, char *argv[])
 	//std::cout << "Pipe name = " << processName << std::endl;
 	//GetNumberPi(iterationsNumber);
 	//std::cout << "Pipe name = " << processName << std::endl;
-	TransmitDataOnServer(iterationsNumber, GetNumberPi(iterationsNumber), processName);
+	//TransmitDataOnServer(iterationsNumber, GetNumberPi(iterationsNumber), processName);
+
+	TransmitDataOnServerToSockets(iterationsNumber, GetNumberPi(iterationsNumber), processName);
 	system("pause");
 }

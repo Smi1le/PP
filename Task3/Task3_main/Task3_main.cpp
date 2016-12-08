@@ -1,9 +1,15 @@
 #include "stdafx.h"
 #include <iostream>
-#include <windows.h>
+//#include <windows.h>
 #include <vector>
 #include <string>
 #include <sstream>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <stdio.h>
+
+#pragma comment(lib, "WS2_32.lib")
+#pragma comment(lib, "wsock32.lib")
 
 
 using namespace std;
@@ -14,6 +20,7 @@ struct SInfoRunProcesses
 	std::vector<PROCESS_INFORMATION> processInformations;
 	std::vector<bool> listFinishedProcesses;
 	HANDLE hPipe;
+	SOCKET serverSock;
 	std::vector<HANDLE> handles;
 	size_t processesNumber;
 	size_t iterationsNumber;
@@ -29,14 +36,108 @@ namespace
 
 	}
 
+	void CreateSockets(SInfoRunProcesses &info)
+	{
+		WSADATA ws;
+		if (FAILED(WSAStartup(MAKEWORD(2, 2), &ws)))
+		{
+			auto error = WSAGetLastError();
+		}
+
+		info.serverSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+		if (info.serverSock == INVALID_SOCKET)
+		{
+			auto error = WSAGetLastError();
+			std::cout << "error1 = " << error << std::endl;
+		}
+		SOCKADDR_IN sin;
+
+		sin.sin_family = AF_INET;
+		sin.sin_port = htons(11111);
+
+		LPHOSTENT hostEnt;
+		hostEnt = gethostbyname("localhost");
+		sin.sin_addr = *((LPIN_ADDR)hostEnt->h_addr_list);
+		//sin.sin_addr.s_addr = INADDR_ANY;
+
+
+		int retVal = bind(info.serverSock, (LPSOCKADDR)&sin, sizeof(sin));
+
+		if (retVal == SOCKET_ERROR)
+		{
+			auto error = WSAGetLastError();
+			std::cout << "error2 = " << error << std::endl;
+		}
+		/*Часть где мы связываемся с клиентом. Перенести в другой метод*/
+		/*SOCKET clientSock;
+		SOCKADDR_IN from;
+		int fromlen = sizeof(from);
+		clientSock = accept(sock, (struct sockaddr*)&from, &fromlen);*/
+
+
+	}
+
+	void WaitForMultipleProcessesToSockets(SInfoRunProcesses &info)
+	{
+		size_t countFinishedProcesses = 0;
+		while (countFinishedProcesses < info.processesNumber)
+		{
+
+			
+			if (listen(info.serverSock, 10) == SOCKET_ERROR)
+			{
+				printf("Unable to listen\n");
+				WSACleanup();
+			}
+
+			std::cout << "first" << std::endl;
+			SOCKET clientSock;
+			SOCKADDR_IN from;
+			int fromlen = sizeof(from);
+
+			clientSock = accept(info.serverSock, (struct sockaddr*)&from, &fromlen);
+			
+			cout << "second" << endl;
+
+			if (clientSock < 0)
+			{
+				std::cout << "Go fast" << std::endl;
+				closesocket(clientSock);
+				continue;
+			}
+			//printf("%s\n", from.sin_addr);
+			//std::cout << int(from.sin_addr) << std::endl;
+			std::cout << from.sin_family << std::endl;
+			std::cout << from.sin_port << std::endl;
+
+			cout << "third" << endl;
+
+			char RecvBuffer[1];
+			std::string send;
+			while (recv(clientSock, RecvBuffer, sizeof(RecvBuffer), 0) != SOCKET_ERROR)
+			{
+				printf("%c", RecvBuffer[0]);
+				send += RecvBuffer[0];
+				//send(s1, MsgText, sizeof(MsgText), MSG_DONTROUTE);
+			}
+
+			cout << "fourth" << endl;
+
+			if (send.size() > 0)
+			{
+				std::cout << "send = " << send << std::endl;
+			}
+			++countFinishedProcesses;
+			closesocket(clientSock);
+		}
+	}
+
+
+
 	std::string GetName(std::string firstName, size_t number, std::string const &namePipe)
 	{
 		std::string name = firstName + IntToString(number) + namePipe;
-		std::vector<TCHAR> allName;
-		allName.resize(name.size());
-		//std::cout << allName.size() << std::endl;
-		std::copy(name.begin(), name.end(), allName.begin());
-		//TCHAR f[] = { *allName.data() };
 		return name;
 	}
 
@@ -106,6 +207,8 @@ namespace
 			CloseHandle(info.processInformations[i].hProcess);
 			CloseHandle(info.processInformations[i].hThread);
 		}
+		closesocket(info.serverSock);
+		WSACleanup();
 	}
 
 	void WaitForMultipleProcesses(SInfoRunProcesses &info)
@@ -147,10 +250,12 @@ namespace
 		SInfoRunProcesses info;
 		info.processesNumber = atoi(argv[1]);
 		info.iterationsNumber = atoi(argv[2]);
-		CreatePipeForProcesses(info);
+		//CreatePipeForProcesses(info);
+		CreateSockets(info);
 		RunProcess(info);
 		
-		WaitForMultipleProcesses(info);
+		//WaitForMultipleProcesses(info);
+		WaitForMultipleProcessesToSockets(info);
 		//WaitForMultipleObjects(DWORD(info.processesNumber), info.handles.data(), TRUE, INFINITE);
 		CloseProcesses(info);
 	}
