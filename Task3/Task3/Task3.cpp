@@ -53,7 +53,10 @@ namespace
 		WORD version = MAKEWORD(2, 2);
 		WSADATA wsaData;
 
-		WSAStartup(version, (LPWSADATA)&wsaData);
+		if (FAILED(WSAStartup(MAKEWORD(2, 2), &wsaData)))
+		{
+			std::cout << WSAGetLastError() << std::endl;
+		}
 
 		LPHOSTENT hostEnt;
 		hostEnt = gethostbyname("localhost");
@@ -66,7 +69,7 @@ namespace
 			std::cout << "error = " << WSAGetLastError() << std::endl;
 		}
 
-		SOCKET clientSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		SOCKET clientSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 		if (clientSock == SOCKET_ERROR)
 		{
@@ -79,21 +82,25 @@ namespace
 		serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
 		serverInfo.sin_port = htons(11111);
 
-		if (!connect(clientSock, (LPSOCKADDR)&serverInfo, sizeof(serverInfo)))
+		if (connect(clientSock, (LPSOCKADDR)&serverInfo, sizeof(serverInfo)) != 0)
 		{
 			std::cout << "Unable to connect" << std::endl;
+			std::cout << "error = " << WSAGetLastError() << std::endl;
 			WSACleanup();
 		}
 
-		char *pBuf = "Request";
+		//char *pBuf = *(*info.c_str());
 
 		printf("Sending request from client\n");
 
 
 		std::cout << "Request" << std::endl;
-		if (send(clientSock, pBuf, strlen(pBuf), 0) == SOCKET_ERROR)
+		std::cout << "info = " << info << std::endl;
+		std::cout << "info.size() << info.size() << std::endl;
+		if (send(clientSock, info.c_str(), info.size(), 0) == SOCKET_ERROR)
 		{
 			printf("Unable to send\n");
+			std::cout << "error = " << WSAGetLastError() << std::endl;
 			WSACleanup();
 		}
 

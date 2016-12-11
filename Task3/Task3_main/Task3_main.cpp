@@ -38,7 +38,7 @@ namespace
 
 	void CreateSockets(SInfoRunProcesses &info)
 	{
-		WSADATA ws;
+		/*WSADATA ws;
 		if (FAILED(WSAStartup(MAKEWORD(2, 2), &ws)))
 		{
 			auto error = WSAGetLastError();
@@ -68,7 +68,7 @@ namespace
 		{
 			auto error = WSAGetLastError();
 			std::cout << "error2 = " << error << std::endl;
-		}
+		}*/
 		/*Часть где мы связываемся с клиентом. Перенести в другой метод*/
 		/*SOCKET clientSock;
 		SOCKADDR_IN from;
@@ -80,6 +80,35 @@ namespace
 
 	void WaitForMultipleProcessesToSockets(SInfoRunProcesses &info)
 	{
+		WSADATA ws;
+		if (FAILED(WSAStartup(MAKEWORD(2, 2), &ws)))
+		{
+			auto error = WSAGetLastError();
+		}
+
+		info.serverSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+		if (info.serverSock == INVALID_SOCKET)
+		{
+			auto error = WSAGetLastError();
+			std::cout << "error1 = " << error << std::endl;
+		}
+		SOCKADDR_IN sin;
+
+		sin.sin_family = PF_INET;
+		sin.sin_port = htons(11111);
+
+		sin.sin_addr.s_addr = INADDR_ANY;
+
+
+		int retVal = bind(info.serverSock, (LPSOCKADDR)&sin, sizeof(sin));
+
+		if (retVal == SOCKET_ERROR)
+		{
+			auto error = WSAGetLastError();
+			std::cout << "error2 = " << error << std::endl;
+		}
+
 		size_t countFinishedProcesses = 0;
 		while (countFinishedProcesses < info.processesNumber)
 		{
@@ -115,12 +144,36 @@ namespace
 
 			char RecvBuffer[1];
 			std::string send;
-			while (recv(clientSock, RecvBuffer, sizeof(RecvBuffer), 0) != SOCKET_ERROR)
+			/*int returnValue = recv(clientSock, RecvBuffer, sizeof(RecvBuffer), 0);
+			while (returnValue != SOCKET_ERROR)
 			{
+				std::cout << "return Value = " << returnValue << std::endl;
 				printf("%c", RecvBuffer[0]);
 				send += RecvBuffer[0];
+				returnValue = recv(clientSock, RecvBuffer, sizeof(RecvBuffer), 0);
+
 				//send(s1, MsgText, sizeof(MsgText), MSG_DONTROUTE);
-			}
+				system("pause");
+			}*/
+			int iResult;
+			do {
+
+				iResult = recv(clientSock, RecvBuffer, sizeof(RecvBuffer), 0);
+				if (iResult > 0)
+				{
+					send += RecvBuffer[0];
+					printf("Bytes received: %d\n", iResult);
+				}
+				else if (iResult == 0)
+				{
+					printf("Connection closed\n");
+				}
+				else
+				{
+					printf("recv failed: %d\n", WSAGetLastError());
+				}
+
+			} while (iResult > 0);
 
 			cout << "fourth" << endl;
 
