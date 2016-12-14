@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 #include <Windows.h>
+#include <chrono>
+
 #include "../src/SocketHelper.h"
 #include "../src/Helper.h"
 #include "../src/PipeHelper.h"
@@ -68,6 +70,7 @@ CAppLauncher::~CAppLauncher()
 
 void CAppLauncher::WaitMessages()
 {
+	auto start = std::chrono::system_clock::now();
 	std::vector<std::string> messages;
 	if (m_type == DataTransferType::Socket)
 	{
@@ -80,6 +83,9 @@ void CAppLauncher::WaitMessages()
 	{
 		SPipeHelper::WaitSend(messages, m_procNumber);
 	}
+	auto end = std::chrono::system_clock::now();
+	std::chrono::duration<double> diff = end - start;
+	std::cout << "Time : " << diff.count() << std::endl;
 	for (auto const &mes : messages)
 	{
 		std::cout << mes << std::endl;
