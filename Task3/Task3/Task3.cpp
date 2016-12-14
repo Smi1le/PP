@@ -25,7 +25,7 @@ namespace
 
 	void TransmitDataOnServer(size_t Nmax, double Pi, std::string const &processName, std::string const &type)
 	{
-		std::string info = helper::NumberToString(Nmax) + ", " + helper::NumberToString(Pi) + ", " + processName;
+		std::string info = processName + ", " + helper::NumberToString(Nmax) + ", " + helper::NumberToString(Pi);
 		if (type == "pipe")
 		{
 			SPipeHelper::SendMes(info);
@@ -69,7 +69,9 @@ int main(int argc, char *argv[])
 {
 	size_t iterationsNumber = atoi(argv[1]);
 	std::string processName = std::string(argv[2]);
-	TransmitDataOnServer(iterationsNumber, GetNumberPi(iterationsNumber), processName, "pipe");
+	std::string type = std::string(argv[3]);
+	
+	TransmitDataOnServer(iterationsNumber, GetNumberPi(iterationsNumber), processName, type);
 
 	system("pause");
 }

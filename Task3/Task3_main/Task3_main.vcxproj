@@ -156,12 +156,14 @@
     <ClInclude Include="..\src\Helper.h" />
     <ClInclude Include="..\src\PipeHelper.h" />
     <ClInclude Include="..\src\SocketHelper.h" />
+    <ClInclude Include="AppLauncher.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\PipeHelper.cpp" />
     <ClCompile Include="..\src\SocketHelper.cpp" />
+    <ClCompile Include="AppLauncher.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
